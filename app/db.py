@@ -20,4 +20,7 @@ class Database:
 
     def close(self):
         self.driver.close()
-        
+
+    def execute(self, query: str, parameters: dict | None = None):
+        with self.driver.session() as session:
+            session.run(query, parameters or {})
