@@ -69,4 +69,25 @@ class Repository:
                m.name AS mission
         """
         return self.run_query(query)
-    
+
+    def run_query_with_ids(self, query: str, parameters: dict | None = None):
+        with self.db.driver.session() as session:
+            result = session.run(query, parameters or {})
+
+            records = []
+            node_ids = set()
+
+            for record in result:
+                row = {}
+
+                for key, value in record.items():
+                    if hasattr(value, "element_id"):
+                        node_ids.add(value.element_id)
+                        row[key] = dict(value)
+                    else:
+                        row[key] = value
+
+                records.append(row)
+
+            return records, list(node_ids)
+        

@@ -12,8 +12,11 @@ interface GraphNode {
 }
 
 interface GraphContextType {
-  selectedNode: GraphNode | null;
-  setSelectedNode: (node: GraphNode | null) => void;
+    selectedNode: GraphNode | null;
+    setSelectedNode: (node: GraphNode | null) => void;
+
+    highlightedNodes: string[];
+    setHighlightedNodes: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const GraphContext = createContext<GraphContextType | undefined>(undefined);
@@ -25,12 +28,17 @@ export function GraphProvider({
 }) {
   const [selectedNode, setSelectedNode] =
     useState<GraphNode | null>(null);
+  const [highlightedNodes, setHighlightedNodes] =
+    useState<string[]>([]);
 
   return (
     <GraphContext.Provider
       value={{
         selectedNode,
         setSelectedNode,
+
+        highlightedNodes,
+        setHighlightedNodes,
       }}
     >
       {children}

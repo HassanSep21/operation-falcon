@@ -31,7 +31,10 @@ export default function GraphView() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
 
-  const { setSelectedNode } = useGraph();
+  const {
+      setSelectedNode,
+      highlightedNodes,
+  } = useGraph();
 
   useEffect(() => {
     async function load() {
@@ -96,16 +99,23 @@ export default function GraphView() {
 
       dagre.layout(g);
 
-      const layoutedNodes: Node[] = [...nodeMap.values()].map((node) => {
-        const p = g.node(node.id);
+      const layoutedNodes = [...nodeMap.values()].map((node) => {
+          const p = g.node(node.id);
 
-        return {
-          ...node,
-          position: {
-            x: p.x,
-            y: p.y,
-          },
-        };
+          return {
+              ...node,
+
+              style: {
+                border: "1px solid #999",
+                background: "#fff",
+                borderRadius: 8,
+              },
+
+              position: {
+                  x: p.x,
+                  y: p.y,
+              },
+          };
       });
 
       setNodes(layoutedNodes);
@@ -114,6 +124,23 @@ export default function GraphView() {
 
     load();
   }, []);
+
+  useEffect(() => {
+    setNodes((prev) =>
+      prev.map((node) => ({
+        ...node,
+        style: {
+          border: highlightedNodes.includes(node.id)
+            ? "3px solid #2563eb"
+            : "1px solid #999",
+          background: highlightedNodes.includes(node.id)
+            ? "#dbeafe"
+            : "#ffffff",
+          borderRadius: 8,
+        },
+      }))
+    );
+  }, [highlightedNodes]);
 
   return (
     <div className="panel h-full">

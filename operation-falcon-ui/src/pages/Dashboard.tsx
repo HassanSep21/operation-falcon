@@ -14,11 +14,11 @@ export default function Dashboard() {
 
         <Sidebar />
 
-        <main className="border-x border-neutral-200 p-6 overflow-hidden">
+        <main className="min-w-0 overflow-hidden border-x border-neutral-200 p-6">
           <GraphView />
         </main>
 
-        <div className="grid grid-rows-[1fr_380px]">
+        <div className="grid min-w-0 grid-rows-[1fr_380px]">
 
           <DetailsPanel />
 
