@@ -5,7 +5,6 @@ import {
   ReactFlow,
   Background,
   Controls,
-  MiniMap,
 } from "@xyflow/react";
 
 import type { Edge, Node } from "@xyflow/react";
@@ -33,7 +32,10 @@ export default function GraphView() {
 
   const {
       setSelectedNode,
+      setSelectedNodeId,
       highlightedNodes,
+      setObjects,
+      selectedNodeId,
   } = useGraph();
 
   useEffect(() => {
@@ -118,6 +120,15 @@ export default function GraphView() {
           };
       });
 
+      const objects = layoutedNodes.map((node) => ({
+        id: node.id,
+        label: node.data.label,
+        type: node.data.labelType,
+        properties: node.data.properties,
+      }));
+
+      setObjects(objects);
+      
       setNodes(layoutedNodes);
       setEdges(edgeList);
     }
@@ -127,20 +138,31 @@ export default function GraphView() {
 
   useEffect(() => {
     setNodes((prev) =>
-      prev.map((node) => ({
-        ...node,
-        style: {
-          border: highlightedNodes.includes(node.id)
-            ? "3px solid #2563eb"
-            : "1px solid #999",
-          background: highlightedNodes.includes(node.id)
-            ? "#dbeafe"
-            : "#ffffff",
-          borderRadius: 8,
-        },
-      }))
+      prev.map((node) => {
+        const isSelected = node.id === selectedNodeId;
+        const isHighlighted = highlightedNodes.includes(node.id);
+
+        return {
+          ...node,
+          style: {
+            border: isSelected
+              ? "3px solid #16a34a"
+              : isHighlighted
+              ? "3px solid #2563eb"
+              : "1px solid #999",
+
+            background: isSelected
+              ? "#dcfce7"
+              : isHighlighted
+              ? "#dbeafe"
+              : "#ffffff",
+
+            borderRadius: 8,
+          },
+        };
+      })
     );
-  }, [highlightedNodes]);
+  }, [highlightedNodes, selectedNodeId]);
 
   return (
     <div className="panel h-full">
@@ -149,17 +171,16 @@ export default function GraphView() {
         nodes={nodes}
         edges={edges}
         onNodeClick={(_, node) => {
-        console.log("Clicked:", node);
+          setSelectedNode({
+            id: node.id,
+            label: node.data.labelType,
+            properties: node.data.properties,
+          });
 
-        setSelectedNode({
-          id: node.id,
-          label: node.data.labelType,
-          properties: node.data.properties,
-        });
-      }}
+          setSelectedNodeId(node.id);
+        }}
       >
         <Background />
-        <MiniMap />
         <Controls />
       </ReactFlow>
     </div>
